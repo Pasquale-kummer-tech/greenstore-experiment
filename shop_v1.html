@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenStore – Mode</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== VERSIONSKENNUNG (oben rechts, klein, unauffällig) ===== */
+/* VERSION_BADGE – wird per Version angepasst */
+
+:root {
+  --forest: #1e3a2f;
+  --sage: #4a7c59;
+  --mint: #a8d5b5;
+  --cream: #f5f0e8;
+  --warm: #e8dcc8;
+  --text: #1a1a1a;
+  --muted: #6b7280;
+  --white: #ffffff;
+  --red: #c0392b;
+  --gold: #b5850a;
+  --shadow: 0 4px 24px rgba(30,58,47,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ONBOARDING MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  background: white;
+  border-radius: 20px;
+  max-width: 460px;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: modalIn 0.4s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.92) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  background: linear-gradient(135deg, var(--forest), var(--sage));
+  padding: 28px 32px 24px;
+  color: white;
+  text-align: center;
+}
+
+.modal-icon { font-size: 3rem; margin-bottom: 10px; }
+
+.modal-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+}
+
+.modal-header p { font-size: 0.9rem; opacity: 0.85; }
+
+.modal-body {
+  padding: 24px 32px 28px;
+}
+
+.modal-body p {
+  color: #444;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+.modal-task {
+  background: var(--cream);
+  border-left: 4px solid var(--sage);
+  border-radius: 0 10px 10px 0;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  color: var(--forest);
+  font-weight: 500;
+}
+
+/* Chat-specific instruction box */
+.modal-chat-hint {
+  background: #e8f5ee;
+  border: 1.5px solid var(--mint);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.modal-chat-hint-icon { font-size: 1.5rem; flex-shrink: 0; }
+
+.modal-chat-hint-text { font-size: 0.85rem; color: var(--forest); line-height: 1.5; }
+.modal-chat-hint-text strong { display: block; margin-bottom: 3px; }
+
+.modal-start-btn {
+  width: 100%;
+  background: var(--forest);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modal-start-btn:hover { background: var(--sage); }
+
+/* Chatbot reminder banner */
+.chat-reminder {
+  background: linear-gradient(90deg, #e8f5ee, #f0faf4);
+  border: 1.5px solid var(--mint);
+  border-radius: 12px;
+  padding: 12px 20px;
+  margin: 0 24px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--forest);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.chat-reminder:hover { box-shadow: 0 4px 16px rgba(74,124,89,0.2); }
+
+.chat-reminder-icon { font-size: 1.4rem; flex-shrink: 0; }
+.chat-reminder strong { display: block; font-weight: 600; }
+.chat-reminder span { opacity: 0.75; font-size: 0.8rem; }
+
+.chat-reminder-arrow {
+  margin-left: auto;
+  font-size: 1.2rem;
+  color: var(--sage);
+  animation: bounceRight 1.5s infinite;
+}
+
+@keyframes bounceRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+/* HEADER */
+header {
+  background: var(--forest);
+  color: var(--white);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.logo span { color: var(--mint); }
+
+.cart-btn {
+  background: var(--sage);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.cart-btn:hover { background: #3d6b4a; }
+
+.cart-count {
+  background: var(--mint);
+  color: var(--forest);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, var(--forest) 0%, var(--sage) 100%);
+  color: white;
+  padding: 48px 40px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1rem;
+  opacity: 0.85;
+  font-weight: 300;
+}
+
+/* MAIN */
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 36px 24px 160px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--forest);
+  margin-bottom: 24px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--mint);
+}
+
+/* PRODUCT GRID */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 22px;
+}
+
+.product-card {
+  background: var(--white);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(30,58,47,0.13);
+}
+
+.product-image {
+  width: 100%;
+  height: 190px;
+  background: var(--warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4.5rem;
+}
+
+.product-info { padding: 16px; }
+
+.product-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  color: var(--forest);
+}
+
+.product-material {
+  font-size: 0.77rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-price {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--forest);
+}
+
+.add-btn {
+  background: var(--forest);
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-btn:hover { background: var(--sage); }
+.add-btn.added { background: var(--sage); }
+
+/* CART PANEL */
+.cart-panel {
+  position: fixed;
+  right: -400px;
+  top: 0;
+  width: 380px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 32px rgba(0,0,0,0.15);
+  z-index: 200;
+  transition: right 0.35s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-panel.open { right: 0; }
+
+.cart-header {
+  background: var(--forest);
+  color: white;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.4rem;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.close-btn:hover { opacity: 1; }
+
+.cart-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.cart-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+}
+
+.cart-item-emoji { font-size: 2rem; }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-weight: 600; font-size: 0.9rem; color: var(--forest); }
+.cart-item-price { font-size: 0.85rem; color: var(--muted); }
+
+.remove-item {
+  background: none;
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.remove-item:hover { opacity: 1; }
+
+.cart-footer {
+  padding: 20px 24px;
+  border-top: 2px solid var(--warm);
+}
+
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  color: var(--forest);
+}
+
+.checkout-btn {
+  width: 100%;
+  background: var(--sage);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.checkout-btn:hover { background: var(--forest); }
+
+/* CHECKOUT PAGE */
+.checkout-inner {
+  max-width: 560px;
+  margin: 40px auto;
+  background: white;
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: var(--shadow);
+}
+
+.checkout-inner h2 {
+  font-family: 'Playfair Display', serif;
+  color: var(--forest);
+  font-size: 1.7rem;
+  margin-bottom: 22px;
+}
+
+.checkout-summary {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.checkout-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--warm);
+}
+
+.checkout-item:last-child { border-bottom: none; }
+
+.checkout-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid var(--mint);
+  color: var(--forest);
+}
+
+.confirm-btn {
+  width: 100%;
+  background: var(--forest);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 6px;
+}
+
+.confirm-btn:hover { background: var(--sage); }
+
+.back-btn {
+  width: 100%;
+  background: none;
+  color: var(--muted);
+  border: 1px solid var(--warm);
+  padding: 11px;
+  border-radius: 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s;
+}
+
+.back-btn:hover { border-color: var(--sage); color: var(--sage); }
+
+/* SUCCESS */
+.success-page {
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.success-icon { font-size: 4rem; margin-bottom: 16px; }
+
+.success-page h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  color: var(--forest);
+  margin-bottom: 12px;
+}
+
+.success-page p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  max-width: 420px;
+  margin: 0 auto 24px;
+}
+
+.code-box {
+  background: var(--forest);
+  color: var(--mint);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 18px 36px;
+  border-radius: 14px;
+  display: inline-block;
+  margin-bottom: 10px;
+  font-family: monospace;
+}
+
+.code-note {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* CHATBOT */
+.chatbot-bubble {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 60px;
+  height: 60px;
+  background: var(--sage);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(74,124,89,0.45);
+  z-index: 300;
+  transition: transform 0.2s;
+  animation: chatPulse 2.5s infinite;
+}
+
+@keyframes chatPulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(74,124,89,0.45); }
+  50% { box-shadow: 0 4px 32px rgba(74,124,89,0.75); }
+}
+
+.chatbot-bubble:hover { transform: scale(1.1); }
+
+.chat-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--red);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Jost', sans-serif;
+}
+
+.chatbot-window {
+  position: fixed;
+  bottom: 100px;
+  right: 28px;
+  width: 360px;
+  height: 500px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  z-index: 300;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatbot-window.open {
+  display: flex;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-header {
+  background: linear-gradient(135deg, var(--forest), var(--sage));
+  color: white;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-avatar {
+  width: 34px;
+  height: 34px;
+  background: var(--mint);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.chat-title { font-weight: 600; font-size: 0.9rem; }
+.chat-subtitle { font-size: 0.7rem; opacity: 0.8; }
+
+.chat-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.chat-close:hover { opacity: 1; }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fafaf8;
+}
+
+.msg {
+  max-width: 85%;
+  padding: 9px 13px;
+  border-radius: 16px;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg.bot {
+  background: white;
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  align-self: flex-start;
+}
+
+.msg.user {
+  background: var(--sage);
+  color: white;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+}
+
+.typing {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 10px 14px;
+  background: white;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.typing span {
+  width: 7px;
+  height: 7px;
+  background: var(--mint);
+  border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+.chat-input-area {
+  padding: 10px 14px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  gap: 8px;
+  background: white;
+}
+
+.chat-input {
+  flex: 1;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 24px;
+  padding: 8px 14px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.84rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.chat-input:focus { border-color: var(--sage); }
+
+.chat-send {
+  background: var(--sage);
+  color: white;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.chat-send:hover { background: var(--forest); }
+.chat-send:disabled { background: #ccc; cursor: not-allowed; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 110px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--forest);
+  color: white;
+  padding: 9px 20px;
+  border-radius: 30px;
+  font-size: 0.82rem;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 500;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* OVERLAY */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 150;
+  display: none;
+}
+
+.overlay.show { display: block; }
+
+/* MIN MESSAGES WARNING */
+.chat-min-warning {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  color: #856404;
+  margin: 0 14px 8px;
+  display: none;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING MODAL (VERSION A - SUSTAINABILITY CHATBOT) -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon">🛍️</div>
+      <h2>Willkommen bei GreenStore</h2>
+      <p>Bitte lies die folgenden Hinweise sorgfältig durch</p>
+    </div>
+    <div class="modal-body">
+      <div class="modal-task">
+        <strong>📋 Deine Aufgabe:</strong><br>
+        Du hast kürzlich einen neuen Job begonnen und möchtest dir neue Kleidung für den Alltag kaufen. Wähle mindestens 2 Produkte aus, die dir gefallen.
+      </div>
+      <!-- CHAT HINT: only shown in versions A and B -->
+      <div class="modal-chat-hint" id="modal-chat-hint">
+        <div class="modal-chat-hint-icon">💬</div>
+        <div class="modal-chat-hint-text">
+          <strong>Wichtig: Nutze den Chat-Assistenten!</strong>
+          Im Shop steht dir ein Assistent zur Verfügung (grüner Button rechts unten). <b>Stelle mindestens 2 Fragen</b>, bevor du zur Kasse gehst – der Assistent hilft dir bei deiner Auswahl.
+        </div>
+      </div>
+      <p style="font-size:0.82rem;color:#888;">Deine Auswahl wird aufgezeichnet. Der Kauf ist simuliert – du zahlst nichts.</p>
+      <button class="modal-start-btn" onclick="startShopping()">Jetzt einkaufen →</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Green<span>Store</span></div>
+  <button class="cart-btn" onclick="toggleCart()">
+    🛍️ Warenkorb
+    <div class="cart-count" id="cart-count">0</div>
+  </button>
+</header>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+
+<!-- SHOP PAGE -->
+<div id="shop-page">
+  <div class="hero">
+    <h1>Mode für jeden Stil</h1>
+    <p>Entdecke unsere Kollektion – klassisch, modern und vielseitig.</p>
+  </div>
+
+  <main>
+    <!-- CHAT REMINDER BANNER (only A and B) -->
+    <div class="chat-reminder" id="chat-reminder" onclick="openChat()">
+      <div class="chat-reminder-icon">💬</div>
+      <div>
+        <strong>Hast du den Assistenten schon genutzt?</strong>
+        <span id="chat-reminder-text">Stelle mindestens 2 Fragen, bevor du zur Kasse gehst.</span>
+      </div>
+      <div class="chat-reminder-arrow">→</div>
+    </div>
+
+    <h2 class="section-title">Unsere Kollektion</h2>
+    <div class="product-grid" id="product-grid"></div>
+  </main>
+</div>
+
+<!-- CHECKOUT PAGE -->
+<div id="checkout-page" style="display:none; padding:40px 24px;">
+  <div class="checkout-inner">
+    <h2>🛍️ Deine Bestellung</h2>
+    <!-- Chat warning shown if not enough messages -->
+    <div class="chat-min-warning" id="chat-min-warning">
+      ⚠️ Du hast den Assistenten noch nicht ausreichend genutzt. Bitte stelle noch mindestens <span id="msgs-remaining">2</span> Fragen, bevor du kaufst.
+    </div>
+    <div class="checkout-summary" id="checkout-summary"></div>
+    <button class="confirm-btn" id="confirm-btn" onclick="confirmOrder()">Kauf abschliessen (simuliert)</button>
+    <button class="back-btn" onclick="backToShop()">← Zurück zum Shop</button>
+  </div>
+</div>
+
+<!-- SUCCESS PAGE -->
+<div id="success-page" class="success-page" style="display:none;">
+  <div class="success-icon">✅</div>
+  <h2>Vielen Dank!</h2>
+  <p>Dein simulierter Kauf wurde abgeschlossen. Notiere deinen persönlichen Code und kehre zur Umfrage zurück.</p>
+  <div class="code-box" id="return-code">GS-XXXX</div>
+  <p class="code-note">Gib diesen Code in der Umfrage ein, um fortzufahren.</p>
+  <br><br>
+  <a id="qualtrics-return-btn" href="#" style="display:none; background:#1e3a2f; color:white; padding:14px 28px; border-radius:12px; text-decoration:none; font-weight:600; font-family:'Jost',sans-serif; font-size:1rem;">
+    ← Zurück zur Umfrage
+  </a>
+</div>
+
+<!-- CART PANEL -->
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h2>Warenkorb</h2>
+    <button class="close-btn" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-list">
+    <p style="color:#999;text-align:center;padding:40px 0;font-size:0.9rem;">Noch keine Produkte hinzugefügt.</p>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>Total</span>
+      <span id="cart-total-price">CHF 0.00</span>
+    </div>
+    <button class="checkout-btn" onclick="goToCheckout()">Zur Kasse →</button>
+  </div>
+</div>
+
+<!-- CHATBOT BUBBLE (A & B only) -->
+<div class="chatbot-bubble" id="chat-bubble" onclick="toggleChat()">
+  🌿
+  <div class="chat-badge" id="chat-badge">!</div>
+</div>
+
+<!-- CHATBOT WINDOW -->
+<div class="chatbot-window" id="chat-window">
+  <div class="chat-header">
+    <div class="chat-avatar" id="chat-avatar-icon">🌿</div>
+    <div>
+      <div class="chat-title" id="chat-name">Lena – Assistentin</div>
+      <div class="chat-subtitle" id="chat-subtitle">Ich helfe dir bei deiner Auswahl</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-input-area">
+    <input class="chat-input" id="chat-input" placeholder="Nachricht schreiben..." onkeydown="if(event.key==='Enter') sendMessage()" />
+    <button class="chat-send" id="send-btn" onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// VERSION CONFIGURATION
+// A = Sustainability Chatbot
+// B = Neutral Chatbot
+// C = No Chatbot
+// ============================================================
+const VERSION = 'A';
+const CHAT_ENABLED = VERSION !== 'C';
+const CHAT_TYPE = VERSION === 'A' ? 'sustainability' : 'neutral';
+const MIN_CHAT_MESSAGES = 2;
+
+// Google Sheets endpoint – replace after setup
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwEC4YbmsWspD0nl4o0Xt25PNBn_JjO_CLX_q-rtY9scxrj-DwBxLLSJM8LHY99zIZeYw/exec';
+// Qualtrics survey URL – replace with your survey link
+const QUALTRICS_URL = 'https://immzhaw.eu.qualtrics.com/jfe/form/SV_ahgBmhjrb1wDr14';
+
+// ResponseID from Qualtrics URL param (?rid=XXXX)
+const urlParams = new URLSearchParams(window.location.search);
+const RESPONSE_ID = urlParams.get('rid') || null;
+
+// Block access if no ResponseID from Qualtrics
+if (!RESPONSE_ID) {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f5f0e8;font-family:'Jost',sans-serif;padding:20px;">
+        <div style="background:white;border-radius:20px;padding:40px;max-width:460px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.12);">
+          <div style="font-size:3rem;margin-bottom:16px;">⚠️</div>
+          <h2 style="font-family:'Playfair Display',serif;color:#1e3a2f;font-size:1.6rem;margin-bottom:12px;">Zugriff nicht möglich</h2>
+          <p style="color:#6b7280;font-size:0.95rem;line-height:1.6;margin-bottom:24px;">
+            Dieser Shop kann nur über die Umfrage geöffnet werden.<br><br>
+            Bitte kehre zur Umfrage zurück und klicke dort auf den Shop-Link.
+          </p>
+          <a href="https://immzhaw.eu.qualtrics.com/jfe/form/SV_ahgBmhjrb1wDr14"
+             style="display:inline-block;background:#1e3a2f;color:white;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:600;font-size:1rem;">
+            ← Zurück zur Umfrage
+          </a>
+        </div>
+      </div>
+    \`;
+  });
+}
+
+// ============================================================
+// PRODUCTS (eco flag hidden from user, used for data tracking)
+// ============================================================
+const products = [
+  { id:1,  name:"Bio-Baumwoll T-Shirt",    price:29.90, material:"100% Bio-Baumwolle, GOTS-zertifiziert",  emoji:"👕", eco:true  },
+  { id:2,  name:"Klassisches T-Shirt",      price:19.90, material:"100% Baumwolle",                         emoji:"👕", eco:false },
+  { id:3,  name:"Recycelte Jeans",           price:89.90, material:"80% recyceltes Denim, 20% Elasthan",    emoji:"👖", eco:true  },
+  { id:4,  name:"Slim-Fit Jeans",            price:69.90, material:"98% Baumwolle, 2% Elasthan",            emoji:"👖", eco:false },
+  { id:5,  name:"Tencel Bluse",              price:59.90, material:"100% Tencel (Lyocell)",                  emoji:"👚", eco:true  },
+  { id:6,  name:"Klassische Bluse",          price:39.90, material:"100% Polyester",                        emoji:"👚", eco:false },
+  { id:7,  name:"Merino-Pullover",           price:109.90, material:"100% Bio-Merinowolle, Mulesing-frei",  emoji:"🧥", eco:true  },
+  { id:8,  name:"Strick-Pullover",           price:49.90, material:"80% Acryl, 20% Polyester",              emoji:"🧥", eco:false },
+  { id:9,  name:"Fair-Trade Hoodie",         price:79.90, material:"Bio-Baumwolle, Fair Trade zertifiziert",emoji:"👘", eco:true  },
+  { id:10, name:"Standard Hoodie",           price:49.90, material:"Baumwoll-Mix",                          emoji:"👘", eco:false },
+  { id:11, name:"Leinen-Hose",               price:79.90, material:"100% Leinen",                           emoji:"👔", eco:true  },
+  { id:12, name:"Elegante Hose",             price:49.90, material:"95% Polyester, 5% Elasthan",            emoji:"👔", eco:false },
+];
+
+let cart = [];
+let chatOpen = false;
+let chatInitialized = false;
+let userMessageCount = 0;
+const conversationHistory = [];
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  renderProducts();
+
+  if (!CHAT_ENABLED) {
+    document.getElementById('chat-bubble').style.display = 'none';
+    document.getElementById('chat-reminder').style.display = 'none';
+    document.getElementById('modal-chat-hint').style.display = 'none';
+  } else {
+    if (CHAT_TYPE === 'neutral') {
+      document.getElementById('chat-avatar-icon').textContent = '💬';
+      document.getElementById('chat-name').textContent = 'Shop-Assistent';
+      document.getElementById('chat-subtitle').textContent = 'Ich beantworte deine Fragen';
+      document.getElementById('chat-bubble').textContent = '💬';
+      // re-add badge
+      const badge = document.createElement('div');
+      badge.className = 'chat-badge';
+      badge.id = 'chat-badge';
+      badge.textContent = '!';
+      document.getElementById('chat-bubble').appendChild(badge);
+    }
+  }
+}
+
+function startShopping() {
+  document.getElementById('modal-overlay').style.display = 'none';
+  if (CHAT_ENABLED) {
+    setTimeout(() => { if (!chatOpen) openChat(); }, 3000);
+  }
+}
+
+// ============================================================
+// PRODUCTS
+// ============================================================
+function renderProducts() {
+  const grid = document.getElementById('product-grid');
+  grid.innerHTML = products.map(p => `
+    <div class="product-card">
+      <div class="product-image">${p.emoji}</div>
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-material">${p.material}</div>
+        <div class="product-footer">
+          <div class="product-price">CHF ${p.price.toFixed(2)}</div>
+          <button class="add-btn" id="btn-${p.id}" onclick="addToCart(${p.id})">+ Hinzufügen</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// CART
+// ============================================================
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  cart.push(p);
+  updateCart();
+  showToast(`${p.emoji} ${p.name} hinzugefügt`);
+  const btn = document.getElementById(`btn-${id}`);
+  btn.textContent = '✓';
+  btn.classList.add('added');
+  setTimeout(() => { btn.textContent = '+ Hinzufügen'; btn.classList.remove('added'); }, 1400);
+}
+
+function removeFromCart(idx) {
+  cart.splice(idx, 1);
+  updateCart();
+}
+
+function updateCart() {
+  document.getElementById('cart-count').textContent = cart.length;
+  const total = cart.reduce((s, p) => s + p.price, 0);
+  document.getElementById('cart-total-price').textContent = `CHF ${total.toFixed(2)}`;
+  const list = document.getElementById('cart-items-list');
+  if (!cart.length) {
+    list.innerHTML = '<p style="color:#999;text-align:center;padding:40px 0;font-size:0.9rem;">Noch keine Produkte hinzugefügt.</p>';
+    return;
+  }
+  list.innerHTML = cart.map((p, i) => `
+    <div class="cart-item">
+      <div class="cart-item-emoji">${p.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${p.name}</div>
+        <div class="cart-item-price">CHF ${p.price.toFixed(2)}</div>
+      </div>
+      <button class="remove-item" onclick="removeFromCart(${i})">🗑</button>
+    </div>
+  `).join('');
+}
+
+function toggleCart() {
+  document.getElementById('cart-panel').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+function closeCart() {
+  document.getElementById('cart-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ============================================================
+// CHECKOUT
+// ============================================================
+function goToCheckout() {
+  if (!cart.length) { showToast('Bitte füge zuerst Produkte hinzu!'); return; }
+  closeCart();
+  document.getElementById('shop-page').style.display = 'none';
+  document.getElementById('checkout-page').style.display = 'block';
+
+  const total = cart.reduce((s, p) => s + p.price, 0);
+  document.getElementById('checkout-summary').innerHTML = `
+    ${cart.map(p => `<div class="checkout-item"><span>${p.emoji} ${p.name}</span><span>CHF ${p.price.toFixed(2)}</span></div>`).join('')}
+    <div class="checkout-total"><span>Total</span><span>CHF ${total.toFixed(2)}</span></div>
+  `;
+
+  // Check if chat requirement met
+  if (CHAT_ENABLED && userMessageCount < MIN_CHAT_MESSAGES) {
+    const remaining = MIN_CHAT_MESSAGES - userMessageCount;
+    document.getElementById('msgs-remaining').textContent = remaining;
+    document.getElementById('chat-min-warning').style.display = 'block';
+    document.getElementById('confirm-btn').style.opacity = '0.4';
+    document.getElementById('confirm-btn').style.pointerEvents = 'none';
+  }
+}
+
+function backToShop() {
+  document.getElementById('shop-page').style.display = 'block';
+  document.getElementById('checkout-page').style.display = 'none';
+}
+
+function confirmOrder() {
+  document.getElementById('checkout-page').style.display = 'none';
+  document.getElementById('success-page').style.display = 'block';
+
+  // Build order data
+  const ecoItems = cart.filter(p => p.eco);
+  const total = cart.reduce((s, p) => s + p.price, 0);
+  const ecoTotal = ecoItems.reduce((s, p) => s + p.price, 0);
+  const ecoRatio = cart.length > 0 ? Math.round((ecoItems.length / cart.length) * 100) : 0;
+  const productNames = cart.map(p => p.name).join(' | ');
+
+  // 1) Send to Google Sheets
+  if (SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbwEC4YbmsWspD0nl4o0Xt25PNBn_JjO_CLX_q-rtY9scxrj-DwBxLLSJM8LHY99zIZeYw/exec') {
+    fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        responseId: RESPONSE_ID,
+        version: VERSION,
+        timestamp: new Date().toISOString(),
+        totalItems: cart.length,
+        ecoItems: ecoItems.length,
+        nonEcoItems: cart.length - ecoItems.length,
+        ecoRatio: ecoRatio,
+        totalPrice: total.toFixed(2),
+        ecoPrice: ecoTotal.toFixed(2),
+        chatMessages: userMessageCount,
+        products: productNames
+      })
+    }).catch(() => {});
+  }
+
+  // 2) Build Qualtrics return URL with all purchase data as parameters
+  const returnParams = new URLSearchParams({
+    rid: RESPONSE_ID,
+    version: VERSION,
+    eco_items: ecoItems.length,
+    total_items: cart.length,
+    eco_ratio: ecoRatio,
+    total_chf: total.toFixed(2),
+    chat_msgs: userMessageCount,
+    products: productNames
+  });
+
+  document.getElementById('return-code').textContent = RESPONSE_ID;
+
+  // Show return button if Qualtrics URL is configured
+  if (QUALTRICS_URL !== 'https://immzhaw.eu.qualtrics.com/jfe/form/SV_ahgBmhjrb1wDr14') {
+    const btn = document.getElementById('qualtrics-return-btn');
+    btn.href = QUALTRICS_URL + '?' + returnParams.toString();
+    btn.style.display = 'inline-block';
+  }
+
+  cart = [];
+  updateCart();
+}
+
+// ============================================================
+// CHATBOT
+// ============================================================
+function openChat() {
+  if (!chatOpen) toggleChat();
+}
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const win = document.getElementById('chat-window');
+  if (chatOpen) {
+    win.classList.add('open');
+    document.getElementById('chat-badge').style.display = 'none';
+    if (!chatInitialized) {
+      chatInitialized = true;
+      if (CHAT_TYPE === 'sustainability') {
+        setTimeout(() => addBotMessage("Hallo! 👋 Ich bin Lena, deine persönliche Assistentin bei GreenStore.\n\nIch helfe dir heute, bewusste Kaufentscheidungen zu treffen. Darf ich dir ein paar nachhaltige Highlights zeigen? 🌿"), 600);
+        setTimeout(() => addBotMessage("Viele unserer Produkte aus Bio-Baumwolle, Tencel oder recycelten Materialien verbrauchen bis zu 70% weniger Wasser als konventionelle Mode. Was interessiert dich am meisten?"), 2400);
+      } else {
+        setTimeout(() => addBotMessage("Hallo! 👋 Ich bin dein Assistent bei GreenStore. Ich helfe dir gerne bei Fragen zu Grössen, Materialien oder der Verfügbarkeit unserer Produkte."), 600);
+        setTimeout(() => addBotMessage("Was kann ich für dich tun?"), 2000);
+      }
+    }
+  } else {
+    win.classList.remove('open');
+  }
+}
+
+function addBotMessage(text) {
+  const msgs = document.getElementById('chat-messages');
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    typing.remove();
+    const msg = document.createElement('div');
+    msg.className = 'msg bot';
+    msg.textContent = text;
+    msgs.appendChild(msg);
+    msgs.scrollTop = msgs.scrollHeight;
+    conversationHistory.push({ role: 'assistant', content: text });
+  }, 900);
+}
+
+// ============================================================
+// RULE-BASED BOT RESPONSES (no API needed)
+// ============================================================
+const sustainabilityResponses = [
+  { keywords: ['empfehlen','empfehlung','vorschlag','was kaufen','was nehmen','was sollte'],
+    reply: "Ich empfehle dir unser Bio-Baumwoll T-Shirt 🌿 – es ist GOTS-zertifiziert und verbraucht bis zu 70% weniger Wasser als konventionelle Baumwolle. Kombiniert mit der Leinen-Hose hast du ein nachhaltiges und stylisches Outfit!" },
+  { keywords: ['nachhaltig','öko','umwelt','bio','grün','green'],
+    reply: "Unsere nachhaltigsten Produkte sind das Bio-Baumwoll T-Shirt, die Tencel Bluse und der Fair-Trade Hoodie 🌿 Alle verzichten auf schädliche Pestizide und werden unter fairen Bedingungen hergestellt." },
+  { keywords: ['t-shirt','shirt','oberteil'],
+    reply: "Unser Bio-Baumwoll T-Shirt (CHF 29.90) ist eine tolle Wahl! 🌱 Es ist GOTS-zertifiziert, was bedeutet: keine Schadstoffe, faire Arbeitsbedingungen und deutlich weniger Wasserverbrauch. Das klassische T-Shirt ist günstiger, besteht aber aus konventioneller Baumwolle." },
+  { keywords: ['jeans','hose','denim'],
+    reply: "Die Recycelte Jeans (CHF 89.90) ist unser Highlight 💚 – 80% des Denims sind recycelt, was den CO2-Ausstoss um rund 40% reduziert. Die Leinen-Hose (CHF 79.90) ist ebenfalls sehr nachhaltig: Leinen braucht kaum Pestizide und ist biologisch abbaubar." },
+  { keywords: ['pullover','pulli','sweat','hoodie','sweater'],
+    reply: "Für Pullover empfehle ich den Merino-Pullover aus Bio-Merinowolle 🐑 – Mulesing-frei und sehr langlebig. Der Fair-Trade Hoodie ist eine weitere tolle Option: Bio-Baumwolle und fairer Lohn für alle Beteiligten." },
+  { keywords: ['bluse','hemd','top'],
+    reply: "Die Tencel Bluse (CHF 59.90) ist unsere nachhaltigste Option in dieser Kategorie 🌿 Tencel wird in einem geschlossenen Wasserkreislauf produziert und ist vollständig biologisch abbaubar. Ein echter Unterschied zur klassischen Polyester-Bluse!" },
+  { keywords: ['preis','kosten','teuer','günstig','billig','chf'],
+    reply: "Nachhaltige Produkte kosten etwas mehr, halten aber deutlich länger – was sie langfristig günstiger macht 💡 Unser günstigster nachhaltiger Artikel ist das Bio-Baumwoll T-Shirt für CHF 29.90." },
+  { keywords: ['material','stoff','was ist','woraus','zusammensetzung'],
+    reply: "Unsere nachhaltigen Materialien: Bio-Baumwolle (GOTS), Tencel/Lyocell, Bio-Merinowolle und recyceltes Denim 🌱 Diese Materialien sind deutlich umweltfreundlicher als Polyester oder konventionelle Baumwolle." },
+  { keywords: ['wasser','co2','umwelt','klima','carbon','footprint'],
+    reply: "Ein konventionelles Baumwoll-T-Shirt verbraucht bis zu 2'700 Liter Wasser 💧 Unser Bio-Baumwoll T-Shirt spart davon bis zu 70%. Die recycelte Jeans reduziert den CO2-Ausstoss gegenüber einer normalen Jeans um rund 40%." },
+  { keywords: ['fair','fair trade','arbeitsbedingungen','produktion','herstellung'],
+    reply: "Unser Fair-Trade Hoodie garantiert faire Löhne und sichere Arbeitsbedingungen entlang der gesamten Lieferkette 🤝 Das Fairtrade-Zertifikat bedeutet: keine Kinderarbeit, existenzsichernde Löhne und transparente Produktion." },
+  { keywords: ['grösse','größe','passt','welche grösse','s m l xl'],
+    reply: "Unsere Produkte sind in den Grössen XS bis XL erhältlich. Als Orientierung: das Bio-Baumwoll T-Shirt fällt normal aus, die Tencel Bluse eher etwas weiter. Bei Unsicherheit empfehlen wir, eine Grösse grösser zu wählen." },
+  { keywords: ['pflege','waschen','wäsche','reinigen'],
+    reply: "Nachhaltige Materialien richtig pflegen: Bio-Baumwolle bei 30–40°C waschen, Tencel und Leinen bei 30°C, Merino-Wolle nur per Hand oder Wollprogramm 🌿 Kältere Temperaturen schonen das Material und sparen Energie." },
+  { keywords: ['versand','lieferung','liefern','shipping','porto'],
+    reply: "Wir versenden CO2-neutral mit DHL GoGreen 📦 Die Lieferzeit beträgt 3–5 Werktage innerhalb der Schweiz. Ab einem Bestellwert von CHF 75 ist der Versand kostenlos." },
+  { keywords: ['danke','super','toll','perfekt','gut','hilfreich','merci'],
+    reply: "Sehr gerne! 😊 Ich freue mich, wenn du eine nachhaltige Wahl triffst. Hast du noch weitere Fragen zu unseren Produkten?" },
+  { keywords: ['hallo','hi','guten tag','hey','grüezi'],
+    reply: "Hallo! 🌿 Schön, dass du da bist. Ich helfe dir gerne, nachhaltige Kleidungsstücke zu finden. Wonach suchst du heute?" },
+];
+
+const neutralResponses = [
+  { keywords: ['empfehlen','empfehlung','vorschlag','was kaufen','was nehmen'],
+    reply: "Ich kann dir leider keine persönlichen Empfehlungen geben, aber du kannst unsere Kollektion frei durchstöbern. Bei Fragen zu Materialien, Grössen oder Pflege helfe ich dir gerne weiter." },
+  { keywords: ['t-shirt','shirt'],
+    reply: "Wir haben zwei T-Shirt-Modelle im Sortiment: eines für CHF 19.90 und eines für CHF 29.90. Beide sind in den Grössen XS bis XL erhältlich." },
+  { keywords: ['jeans','hose','denim'],
+    reply: "Unsere Jeans sind in Grössen 28–36 erhältlich. Wir haben zwei Modelle: eine für CHF 69.90 und eine für CHF 89.90. Fällt dir eine Frage zu Material oder Passform ein?" },
+  { keywords: ['pullover','pulli','hoodie','sweat'],
+    reply: "Unsere Pullover und Hoodies sind in den Grössen XS bis XL verfügbar. Die Preise liegen zwischen CHF 49.90 und CHF 109.90." },
+  { keywords: ['bluse','top','oberteil'],
+    reply: "Unsere Blusen sind in Grösse XS bis XL erhältlich, zu Preisen von CHF 39.90 und CHF 59.90." },
+  { keywords: ['preis','kosten','chf','kostet'],
+    reply: "Unsere Produkte kosten zwischen CHF 19.90 und CHF 109.90. Der genaue Preis ist auf der jeweiligen Produktkarte angegeben." },
+  { keywords: ['material','stoff','woraus','zusammensetzung'],
+    reply: "Die Materialzusammensetzung ist bei jedem Produkt direkt auf der Karte angegeben – zum Beispiel Baumwolle, Polyester, Leinen oder Wolle." },
+  { keywords: ['grösse','größe','passt','welche grösse'],
+    reply: "Unsere Produkte sind in den Grössen XS, S, M, L und XL erhältlich. Bei Unsicherheit empfehlen wir, eine Grösse grösser zu wählen." },
+  { keywords: ['pflege','waschen','wäsche','reinigen'],
+    reply: "Die Pflegehinweise sind auf dem Etikett des jeweiligen Produktes angegeben. Baumwolle kann bei 40°C gewaschen werden, Wolle nur im Wollprogramm." },
+  { keywords: ['versand','lieferung','liefern','porto'],
+    reply: "Die Lieferzeit beträgt 3–5 Werktage in der Schweiz. Ab einem Bestellwert von CHF 75 ist der Versand kostenlos." },
+  { keywords: ['danke','super','toll','perfekt','merci'],
+    reply: "Gern geschehen! Kann ich dir noch mit etwas anderem helfen?" },
+  { keywords: ['hallo','hi','guten tag','hey','grüezi'],
+    reply: "Hallo! Wie kann ich dir heute helfen? Ich beantworte gerne Fragen zu Grössen, Materialien oder Versand." },
+];
+
+const fallbackSustainability = [
+  "Gute Frage! 🌿 Generell gilt: Produkte aus Bio-Baumwolle, Tencel oder recycelten Materialien sind die nachhaltigste Wahl in unserem Shop.",
+  "Ich empfehle dir, besonders auf die Materialangaben zu achten – Bio-Baumwolle und Tencel sind deutlich umweltfreundlicher als Polyester oder konventionelle Baumwolle 🌱",
+  "Als Faustregel: Je natürlicher und zertifizierter das Material, desto nachhaltiger das Produkt. Soll ich dir ein konkretes Produkt empfehlen? 🌿",
+  "Nachhaltige Mode ist eine Investition – sie hält länger, ist schadstoffärmer und schont Klima und Ressourcen 💚 Schau dir besonders unser Bio-Baumwoll T-Shirt und die Tencel Bluse an!",
+];
+
+const fallbackNeutral = [
+  "Für diese Frage bin ich leider nicht der richtige Ansprechpartner. Ich helfe dir gerne bei Fragen zu Grössen, Materialien, Pflege oder Versand.",
+  "Das kann ich dir leider nicht beantworten. Hast du Fragen zu einem bestimmten Produkt oder zur Lieferung?",
+  "Bei allgemeinen Stilfragen kann ich leider nicht helfen. Aber bei Fragen zu Verfügbarkeit, Grössen oder Pflege bin ich für dich da!",
+];
+
+function getRuleBasedResponse(userText) {
+  const lower = userText.toLowerCase();
+  const responses = CHAT_TYPE === 'sustainability' ? sustainabilityResponses : neutralResponses;
+  const fallbacks = CHAT_TYPE === 'sustainability' ? fallbackSustainability : fallbackNeutral;
+
+  for (const item of responses) {
+    if (item.keywords.some(kw => lower.includes(kw))) {
+      return item.reply;
+    }
+  }
+  // fallback – rotate through fallbacks
+  const idx = Math.floor(Math.random() * fallbacks.length);
+  return fallbacks[idx];
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  const msgs = document.getElementById('chat-messages');
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'msg user';
+  userMsg.textContent = text;
+  msgs.appendChild(userMsg);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  userMessageCount++;
+  updateChatReminder();
+
+  document.getElementById('send-btn').disabled = true;
+  input.disabled = true;
+
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Simulate thinking delay (600-1200ms)
+  const delay = 600 + Math.random() * 600;
+  setTimeout(() => {
+    typing.remove();
+    const reply = getRuleBasedResponse(text);
+    const botMsg = document.createElement('div');
+    botMsg.className = 'msg bot';
+    botMsg.textContent = reply;
+    msgs.appendChild(botMsg);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    document.getElementById('send-btn').disabled = false;
+    input.disabled = false;
+    input.focus();
+  }, delay);
+}
+
+function updateChatReminder() {
+  const reminder = document.getElementById('chat-reminder-text');
+  if (userMessageCount >= MIN_CHAT_MESSAGES) {
+    reminder.textContent = `✓ Danke! Du hast den Assistenten ${userMessageCount}x genutzt.`;
+    document.getElementById('chat-reminder').style.background = 'linear-gradient(90deg, #d4edda, #e8f5ee)';
+    document.getElementById('chat-reminder').style.borderColor = '#4a7c59';
+    // Unlock confirm button if on checkout
+    document.getElementById('chat-min-warning').style.display = 'none';
+    document.getElementById('confirm-btn').style.opacity = '1';
+    document.getElementById('confirm-btn').style.pointerEvents = 'auto';
+  } else {
+    const remaining = MIN_CHAT_MESSAGES - userMessageCount;
+    reminder.textContent = `Noch ${remaining} Frage(n) erforderlich, bevor du zur Kasse gehst.`;
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ============================================================
+// START
+// ============================================================
+init();
+</script>
+</body>
+</html>
