@@ -1193,7 +1193,7 @@ function backToShop() {
 
 function skipPurchase() {
   // Send empty order to Google Sheets
-  if (SHEETS_URL !== 'SHEETS_URL_PLACEHOLDER') {
+  if (true) {
     (() => {
       const params = new URLSearchParams({
         responseId: RESPONSE_ID,
@@ -1251,7 +1251,7 @@ function confirmOrder() {
   const productNames = cart.map(p => p.name).join(' | ');
 
   // 1) Send to Google Sheets
-  if (SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbyWygGFY2HDQ0F-LhijU8eqNUAiqlRK8t8f95m-I24ScDEhMJIAbfcQ8DEInYADJOyBqA/exec') {
+  if (true) {
     (() => {
       const params = new URLSearchParams({
         responseId: RESPONSE_ID,
