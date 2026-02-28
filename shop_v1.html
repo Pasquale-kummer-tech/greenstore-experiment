@@ -944,11 +944,9 @@ main {
 <div id="success-page" class="success-page" style="display:none;">
   <div class="success-icon">✅</div>
   <h2 id="success-title">Vielen Dank!</h2>
-  <p id="success-msg">Dein simulierter Kauf wurde abgeschlossen. Notiere deinen persönlichen Code und kehre zur Umfrage zurück.</p>
-  <div class="code-box" id="return-code">GS-XXXX</div>
-  <p class="code-note">Gib diesen Code in der Umfrage ein, um fortzufahren.</p>
-  <br><br>
-  <a id="qualtrics-return-btn" href="#" style="display:none; background:#1a3a5c; color:white; padding:14px 28px; border-radius:12px; text-decoration:none; font-weight:600; font-family:'Jost',sans-serif; font-size:1rem;">
+  <p id="success-msg">Dein simulierter Kauf wurde abgeschlossen. Bitte kehre jetzt zur Umfrage zurück um fortzufahren.</p>
+  <br>
+  <a id="qualtrics-return-btn" href="#" style="display:inline-block; background:#1a3a5c; color:white; padding:14px 28px; border-radius:12px; text-decoration:none; font-weight:600; font-family:'Jost',sans-serif; font-size:1rem;">
     ← Zurück zur Umfrage
   </a>
 </div>
@@ -1119,7 +1117,7 @@ function addToCart(id) {
   const p = products.find(x => x.id === id);
   cart.push(p);
   updateCart();
-  showToast(`${p.emoji} ${p.name} hinzugefügt`);
+  showToast(`${p.name} hinzugefügt ✓`);
   const btn = document.getElementById(`btn-${id}`);
   btn.textContent = '✓';
   btn.classList.add('added');
@@ -1142,7 +1140,7 @@ function updateCart() {
   }
   list.innerHTML = cart.map((p, i) => `
     <div class="cart-item">
-      <div class="cart-item-emoji">${p.emoji}</div>
+      <div class="cart-item-emoji"><img src="${p.img}" alt="${p.name}" style="width:48px;height:48px;object-fit:contain;border-radius:6px;background:#f5f5f5;"></div>
       <div class="cart-item-info">
         <div class="cart-item-name">${p.name}</div>
         <div class="cart-item-price">CHF ${p.price.toFixed(2)}</div>
@@ -1173,7 +1171,7 @@ function goToCheckout() {
 
   const total = cart.reduce((s, p) => s + p.price, 0);
   document.getElementById('checkout-summary').innerHTML = `
-    ${cart.map(p => `<div class="checkout-item"><span>${p.emoji} ${p.name}</span><span>CHF ${p.price.toFixed(2)}</span></div>`).join('')}
+    ${cart.map(p => `<div class="checkout-item"><span><img src="${p.img}" style="width:32px;height:32px;object-fit:contain;vertical-align:middle;margin-right:6px;border-radius:4px;background:#f5f5f5;"> ${p.name}</span><span>CHF ${p.price.toFixed(2)}</span></div>`).join('')}
     <div class="checkout-total"><span>Total</span><span>CHF ${total.toFixed(2)}</span></div>
   `;
 
