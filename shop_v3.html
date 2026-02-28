@@ -1062,6 +1062,7 @@ function init() {
     document.getElementById('chat-reminder').style.display = 'none';
     document.getElementById('modal-chat-hint').style.display = 'none';
   } else {
+    document.getElementById('modal-chat-hint').style.display = 'flex';
     if (CHAT_TYPE === 'neutral') {
       document.getElementById('chat-avatar-icon').textContent = '💬';
       document.getElementById('chat-name').textContent = 'Shop-Assistent';
