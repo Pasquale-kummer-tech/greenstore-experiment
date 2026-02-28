@@ -1231,7 +1231,7 @@ function skipPurchase() {
     products: 'KEIN_KAUF'
   });
 
-  if (QUALTRICS_URL !== 'https://immzhaw.eu.qualtrics.com/jfe/form/SV_ahgBmhjrb1wDr14') {
+  if (true) {
     const btn = document.getElementById('qualtrics-return-btn');
     btn.href = QUALTRICS_URL + '?' + returnParams.toString();
     btn.style.display = 'inline-block';
